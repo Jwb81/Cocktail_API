@@ -1,2 +1,5 @@
 # ignore everything in node_modules
 node_modules/
+
+# ignore mLab connection URL
+config/db.js

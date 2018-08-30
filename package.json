@@ -1,0 +1,28 @@
+{
+  "name": "cocktail_api",
+  "version": "1.0.0",
+  "description": "An API to retrieve cocktail recipes and ingredients",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jwb81/Cocktail_API.git"
+  },
+  "author": "Jason Barnett",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jwb81/Cocktail_API/issues"
+  },
+  "homepage": "https://github.com/Jwb81/Cocktail_API#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongodb": "^3.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}

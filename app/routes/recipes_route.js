@@ -2,6 +2,14 @@
 var ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
+    // get all recipes
+    app.get('/recipes', (req, res) => {
+        db.collection('recipes').find({}).toArray((err, result) => {
+            if (err) res.send(err);
+            res.send(result);
+        });
+    });
+
     app.get('/recipes/:id', (req, res) => {
         const details = { '_id' : new ObjectID(req.params.id) };
 
@@ -49,4 +57,6 @@ module.exports = function(app, db) {
           } 
         });
     });
+
+    
 };

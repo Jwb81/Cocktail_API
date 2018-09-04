@@ -6,50 +6,57 @@ module.exports = function(app, db) {
     app.get('/users/:id', (req, res) => {
         const details = { '_id' : new ObjectID(req.params.id) };
 
-        db.collection('recipes').findOne(details, (err, item) => {
+        db.collection('users').findOne(details, (err, item) => {
             if (err) res.send({'error' : 'An error has occurred'});
 
             res.send(item);
         })
     });
 
+    // find a user with certain username and password
     app.post('/users', (req, res) => {
-        // create a new user
-        const user = {};
+        const details = { 'username' : req.body.username, 'password' : req.body.password };
+
+        db.collection('users').findOne(details, (err, item) => {
+            if (err) res.send({'error' : 'An error has occurred'});
+            res.send(item);
+        })
+    })
+
+    // get user favorites by username 
+    app.get('/users/favorites/:username', (req, res) => {
+        const details = { username : req.params.username };
+
+        db.collection('users').findOne(details, (err, item) => {
+            if (err) res.send({'error' : 'An error has occurred'});
+            res.send(item.favorites);
+        })
+    })
+
+    // update user favorites
+    app.put('/users/favorites', (req, res) => {
         
-        db.collection('users').insertOne(user, (err, result) => {
-            if (err) res.send({ 'error': 'An error has occurred' });
+        const details = { username : req.body.username };
+        const favorites = { $set : { favorites : JSON.parse(req.body.favorites) } };
 
-            res.send(result);
+        
+
+        db.collection('users').updateOne(details, favorites, (err, result) => {
+            if (err) {
+                res.send({'error':'An error has occurred'});
+            } else {
+                res.send(result);
+            } 
         });
-    });
+    })
 
-    app.delete('/user/:id', (req, res) => {
+    // update (or create) an ingredient
+    app.put('/ingredients/:id', (req, res) => {
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
+        const ingredient = { $set : { name: req.body.name, cost: req.body.cost }};
         
-        db.collection('users').deleteOne(details, (err, item) => {
-          if (err) {
-            res.send({'error':'An error has occurred'});
-          } else {
-            res.send('Recipe ' + id + ' deleted!');
-          } 
-        });
+       
     });
-
-    app.put('/users/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        const user = { $set : {  }};
-        
-        db.collection('recipes').updateOne(details, user, (err, result) => {
-          if (err) {
-              res.send({'error':'An error has occurred'});
-          } else {
-              res.send(recipe);
-          } 
-        });
-    });
-
     
 };

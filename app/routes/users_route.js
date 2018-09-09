@@ -50,13 +50,4 @@ module.exports = function(app, db) {
         });
     })
 
-    // update (or create) an ingredient
-    app.put('/ingredients/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        const ingredient = { $set : { name: req.body.name, cost: req.body.cost }};
-        
-       
-    });
-    
 };

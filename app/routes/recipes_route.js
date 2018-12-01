@@ -1,62 +1,145 @@
+const router = require('express').Router();
+const orm = require('../../config/orm');
 
-var ObjectID = require('mongodb').ObjectID;
+const collection = 'test_recipes';
 
-module.exports = function(app, db) {
-    // get all recipes
-    app.get('/recipes', (req, res) => {
-        db.collection('recipes').find({}).toArray((err, result) => {
-            if (err) res.send(err);
-            res.send(result);
+
+// get all recipes
+router.get('/recipes', (req, res) => {
+    orm.getAll(collection, (err, items) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+        res.json({
+            success: true,
+            data: items
         });
-    });
+    })
+});
 
-    app.get('/recipes/:id', (req, res) => {
-        const details = { '_id' : new ObjectID(req.params.id) };
 
-        db.collection('recipes').findOne(details, (err, item) => {
-            if (err) res.send({'error' : 'An error has occurred'});
+// get recipe by ID
+router.get('/recipes/id/:id', (req, res) => {
+    orm.getOne(collection, req.params.id, (err, item) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
 
-            res.send(item);
+        res.json({
+            success: true,
+            data: item
+        });
+    })
+});
+
+
+// filter recipe names by a search term
+router.get('/recipes/filter/:term', (req, res) => {
+    const searchTerm = req.params.term;
+    
+    orm.filterByName(collection, searchTerm, (err, items) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true,
+            data: items
+        });
+    })
+});
+
+router.get('/recipes/makeable', (req, res) => {
+    console.log(req.body);
+})
+
+// add a new recipe
+router.post('/recipes', (req, res) => {
+    const body = req.body;
+
+    // make sure the recipe isn't already created
+    // do stuff here
+
+
+    // Create the recipe here
+    const recipeObj = {
+        name: body.name,
+        image: body.image,
+        extras: body.extras,
+        standard_drink_size: body.std_drink_size,
+        recipe: body.recipe
+    }
+
+    orm.insertOne(collection, recipeObj, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
         })
-    });
-
-    app.post('/recipes', (req, res) => {
-        // Create a recipe here
-        const recipe = {name : req.body.name, cost : req.body.cost};
-        
-        db.collection('recipes').insertOne(recipe, (err, result) => {
-            if (err) res.send({ 'error': 'An error has occurred' });
-
-            res.send(result);
-        });
-    });
-
-    app.delete('/recipes/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        
-        db.collection('recipes').deleteOne(details, (err, item) => {
-          if (err) {
-            res.send({'error':'An error has occurred'});
-          } else {
-            res.send('Recipe ' + id + ' deleted!');
-          } 
-        });
-    });
-
-    app.put('/recipes/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        const recipe = { $set : { name: req.body.name, cost: req.body.cost }};
-        
-        db.collection('recipes').updateOne(details, recipe, (err, result) => {
-          if (err) {
-              res.send({'error':'An error has occurred'});
-          } else {
-              res.send(recipe);
-          } 
-        });
-    });
+    })
 
     
-};
+});
+
+router.delete('/recipes/:id', (req, res) => {
+    orm.deleteById(collection, req.params.id, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
+        });
+    })
+    
+});
+
+router.put('/recipes/:id', (req, res) => {
+    const id = req.params.id;
+    
+    const updateObj = {
+        $set: {
+            name: req.body.name,
+            cost: req.body.cost
+        }
+    };
+
+    orm.updateById(collection, id, updateObj, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
+        })
+    })
+});
+
+
+module.exports = router;

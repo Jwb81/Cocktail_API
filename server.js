@@ -1,32 +1,48 @@
+const express = require('express');
+// const MongoClient = require('mongodb').MongoClient;
+const path = require('path');
+// const config = require('./config/config');
+const mongo = require('./config/mongo');
 
-const express       = require('express');
-const MongoClient   = require('mongodb').MongoClient;
-const bodyParser    = require('body-parser');
-let db              = require('./config/db');
+const app = express();
+const port = process.env.PORT || 1001; // server is 1000, API is 1001
 
-const app           = express();
-const port          = 1000;
+app.use(express.urlencoded({
+    extended: true
+}));
+app.use(express.json());
 
-app.use(bodyParser.urlencoded({ extended : true }));
-
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 })
 
-MongoClient.connect(db.url, { useNewUrlParser: true }, (err, database) => {
-    if (err) return console.log(err);
+app.use(express.static(path.join(__dirname, 'public')));
 
-    // for Mongo versions 3.0+
-    db = database.db("bartender");
-    require('./app/routes')(app, db);
-    
+// initialize the database
+mongo.init(err => {
+    if (err) {
+        throw err;
+    }
+
+    // add routes
+    app.use(require('./app/routes/ingredients_route'));
+    app.use(require('./app/routes/recipes_route'));
+    // app.use(require('./app/routes/users_route'));
+    // app.use(require('./app/routes/testroute'));
+
+    // default app
+    app.get('*', (req, res) => {
+        // fill in a 404 page here
+        res.send('That is not a valid route')
+    })
+
     // start the app if the connection to the database is successful
     app.listen(port, () => {
         console.log('API listening on port ' + port);
     })
-
 })
+
 

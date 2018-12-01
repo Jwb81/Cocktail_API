@@ -1,67 +1,130 @@
+const router = require('express').Router();
+const orm = require('../../config/orm');
 
+const collection = 'test_ingredients';
+
+router.get('/ingredients', (req, res) => {
+    orm.getAll(collection, (err, items) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+        res.json(items);
+    })
+});
+
+// get one ingredient's object
+router.get('/ingredients/:id', (req, res) => {
+    orm.getOne(collection, req.params.id, (err, item) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json(item);
+    })
+});
+
+// filter ingredients by a search term
+router.get('/ingredients/filter/:term', (req, res) => {
+    const searchTerm = req.params.term;
     
+    orm.filterByName(collection, searchTerm, (err, items) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
 
-var ObjectID = require('mongodb').ObjectID;
-
-module.exports = function(app, db) {
-    // get all ingredients
-    app.get('/ingredients', (req, res) => {
-        db.collection('ingredients').find({}).toArray((err, result) => {
-            if (err) res.send(err);
-            res.send(result);
-        });
-    });
-
-    // get one ingredient's object
-    app.get('/ingredients/:id', (req, res) => {
-        const details = { '_id' : new ObjectID(req.params.id) };
-
-        db.collection('ingredients').findOne(details, (err, item) => {
-            if (err) res.send({'error' : 'An error has occurred'});
-
-            res.send(item);
+        res.json({
+            success: true,
+            data: items
         })
-    });
+    })
+})
 
-    // add an ingredients
-    app.post('/ingredients', (req, res) => {
-        const ingredient = {name : req.body.name, cost : req.body.cost};
-        
-        db.collection('ingredients').insertOne(ingredient, (err, result) => {
-            if (err) res.send({ 'error': 'An error has occurred' });
+// add an ingredients
+router.post('/ingredients', (req, res) => {
+    const body = req.body;
 
-            res.send(result);
+    const ingredientObj = {
+        name: body.name,
+        image: body.image,
+        generic_type: body.generic_type,
+        alcohol_content: body.abv,
+        serving_size: body.serving_size,
+        description: body.description,
+        relay_location: body.relay_location,
+        active: body.active
+    };
+
+    orm.insertOne(collection, ingredientObj, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
+        })
+    })
+});
+
+// delete an ingredient
+router.delete('/ingredients/:id', (req, res) => {
+    const id = req.params.id;
+
+    orm.deleteById(collection, id, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
         });
-    });
+    })
+});
 
-    // delete an ingredient
-    app.delete('/ingredients/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        
-        db.collection('ingredients').deleteOne(details, (err, item) => {
-          if (err) {
-            res.send({'error':'An error has occurred'});
-          } else {
-            res.send('Recipe ' + id + ' deleted!');
-          } 
+// update (or create) an ingredient
+router.put('/ingredients/:id', (req, res) => {
+    const id = req.params.id;
+
+    const ingredientObj = {
+        $set: {
+            name: req.body.name,
+            cost: req.body.cost
+        }
+    };
+
+    orm.updateById(collection, id, ingredientObj, (err, result) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            success: true
         });
-    });
+    })
+});
 
-    // update (or create) an ingredient
-    app.put('/ingredients/:id', (req, res) => {
-        const id = req.params.id;
-        const details = { '_id': new ObjectID(id) };
-        const ingredient = { $set : { name: req.body.name, cost: req.body.cost }};
-        
-        db.collection('ingredients').updateOne(details, ingredient, (err, result) => {
-          if (err) {
-              res.send({'error':'An error has occurred'});
-          } else {
-              res.send(recipe);
-          } 
-        });
-    });
 
-    
-};
+module.exports = router;

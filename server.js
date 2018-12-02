@@ -31,7 +31,6 @@ mongo.init(err => {
     app.use(require('./app/routes/ingredients_route'));
     app.use(require('./app/routes/recipes_route'));
     // app.use(require('./app/routes/users_route'));
-    // app.use(require('./app/routes/testroute'));
 
     // default app
     app.get('*', (req, res) => {

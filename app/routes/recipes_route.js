@@ -38,6 +38,19 @@ router.get('/recipes/id/:id', (req, res) => {
             data: item
         });
     })
+    // orm.getByIds(collection, [req.params.id], (err, item) => {
+    //     if (err) {
+    //         return res.json({
+    //             status: 404,
+    //             error: err.message
+    //         });
+    //     }
+
+    //     res.json({
+    //         status: 200,
+    //         data: item
+    //     });
+    // })
 });
 
 
@@ -62,7 +75,21 @@ router.get('/recipes/filter/:term', (req, res) => {
 });
 
 router.get('/recipes/makeable', (req, res) => {
-    console.log(req.body);
+    const ingredientsArray = req.body.ingredients;
+
+    orm.getMakeableRecipes(ingredientsArray, (err, recipes) => {
+        if (err) {
+            return res.json({
+                status: 404,
+                success: false,
+                error: err.message
+            });
+        }
+
+        console.log(`Recipes: ${recipes}`)
+
+        res.json(recipes);
+    })
 })
 
 // add a new recipe

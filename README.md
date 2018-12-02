@@ -1,7 +1,18 @@
 # Cocktail_API
-An API to contact a database full of cocktail recipes and ingredients
+An API to get cocktail recipes and ingredients, and the images to go along with them.
 
-The database is being hosted on mLab and it contains multiple collections:
-    * recipes (for drinks that are already made)
-    * ingredients (for all of the ingredients that are currently loaded in the machine)
-    * users (for registered users and all of their data)
+### Images
+    - Images are stored in the 'images' directory
+
+
+### Collections
+    - Recipes
+    - Ingredients
+
+
+# Recipes
+### GET /recipes
+Gets all recipes available
+
+### GET /recipes/id/{recipe_id}
+Get one recipe by its ID

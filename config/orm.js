@@ -138,52 +138,7 @@ const orm = {
         });
     },
 
-    // getMakeableRecipes: (currIngredientsArr, cb) => {
-    //     // const collection = 'test_recipes';
-    //     const collection = 'test_ingredients';
-    //     return new Promise((resolve, reject) => {
-    //             // get all recipes
-    //             orm.getAll(collection, (err, items) => {
-    //                 if (err) {
-    //                     return reject(new Error(err));
-    //                 }
-
-    //                 console.log('returning from getAll');
-    //                 resolve(items);
-    //             });
-    //         })
-    //         .then(items => {
-    //             return orm.getAll(collection, (err, moreItems) => {
-    //                 console.log('In .then()');
-    //                 // console.log(moreItems);
-    //                 cb(null, moreItems);
-    //                 return moreItems;
-    //             })
-    //         })
-    //         .then(moreItems => {
-    //             console.log('moreItems');
-    //         })
-    //         .catch(err => {
-    //             cb(err);
-    //         })
-    // },
-
-    // getMakeableRecipes: (collection, currIngredientsArr, cb) => {
-    //     return new Promise((resolve, reject) => {
-    //             // get all recipes
-    //             orm.getAll(collection, (err, items) => {
-    //                 if (err) {
-    //                     return reject(new Error(err));
-    //                 }
-
-    //                 resolve(orm.filterMakeableRecipes(currIngredientsArr, items));
-    //             });
-    //         })
-    //         .catch(err => {
-    //             cb(err);
-    //         })
-    // },
-
+    
     getMakeableRecipes: (currIngredientsArr, cb) => {
         currIngredientsArr = ["5b92ba92e7179a26041b2f83", "5b92bac4e7179a26041b2f87"];
 

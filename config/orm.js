@@ -138,7 +138,7 @@ const orm = {
         });
     },
 
-    
+
     getMakeableRecipes: (currIngredientsArr, cb) => {
         currIngredientsArr = ["5b92ba92e7179a26041b2f83", "5b92bac4e7179a26041b2f87"];
 
@@ -164,21 +164,53 @@ const orm = {
     filterMakeableRecipes: (current, all) => {
         return all.filter(a => {
             let keep = false;
-            a.recipe.forEach(aIngredient => {
+
+
+            for (let i = 0; i < a.recipe.length; i++) {
+                const aIngredient = a.recipe[i];
                 keep = false;
-                current.forEach(cIngredient => {
-                    if (((aIngredient.generic_ingredient === cIngredient.name) || (aIngredient.specific_ingredient == cIngredient.name) ||
-                            (aIngredient.generic_ingredient === cIngredient.generic_ingredient) || (aIngredient.specific_ingredient == cIngredient.generic_ingredient))) {
-                        console.log(`
-                                    Recipe generic: ${aIngredient.generic_ingredient}
-                                    Recipe specific: ${aIngredient.specific_ingredient}
-                                    Ingred generic: ${cIngredient.generic_ingredient}
-                                    Ingred specific: ${cIngredient.generic_ingredient}
-                                `)
-                        keep = true;
-                    }
-                });
-            });
+
+                // convert to a .find() function
+                const found = current.find(currIng => {
+                    return ((currIng.generic_type === aIngredient.generic_ingredient) ||
+                        (currIng.generic_type === aIngredient.specific_ingredient) ||
+                        (currIng.name === aIngredient.generic_ingredient) ||
+                        (currIng.name === aIngredient.specific_ingredient));
+                })
+                // console.log(`Found: ${JSON.stringify(found)}`);
+                keep = found ? true : false;
+
+                if (!keep) {
+                    break;  // break out of 'for' loop to return false
+                }
+            }
+
+            // a.recipe.forEach(aIngredient => {
+            //     keep = false;
+
+            //     // convert to a .find() function
+            //     const found = current.find(currIng => {
+            //         return ((currIng.generic_type === aIngredient.generic_ingredient) ||
+            //             (currIng.generic_type === aIngredient.specific_ingredient) ||
+            //             (currIng.name === aIngredient.generic_ingredient) ||
+            //             (currIng.name === aIngredient.specific_ingredient));
+            //     })
+            //     // console.log(`Found: ${JSON.stringify(found)}`);
+            //     keep = found ? true : false;
+
+            //     // current.forEach(cIngredient => {
+            //     //     if (((aIngredient.generic_ingredient === cIngredient.name) || (aIngredient.specific_ingredient == cIngredient.name) ||
+            //     //             (aIngredient.generic_ingredient === cIngredient.generic_type) || (aIngredient.specific_ingredient == cIngredient.generic_type))) {
+            //     //         // console.log(`
+            //     //         //             Recipe generic: ${aIngredient.generic_ingredient}
+            //     //         //             Recipe specific: ${aIngredient.specific_ingredient}
+            //     //         //             Ingred generic: ${cIngredient.generic_type}
+            //     //         //             Ingred specific: ${cIngredient.name}
+            //     //         //         `)
+            //     //         keep = true;
+            //     //     }
+            //     // });
+            // });
             return keep;
         });
     },

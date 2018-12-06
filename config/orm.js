@@ -1,7 +1,16 @@
 const config = require('./config')
+const sqlConn = require('./sql_connection');
 const mongo = require('./mongo');
-const db = mongo.db;
 var ObjectID = require('mongodb').ObjectID;
+const db = mongo.db;
+
+sqlConn.query('select * from user_accounts', (err, result) => {
+    if (err) {
+        return console.log(err);
+    }
+
+    console.log(result);
+})
 
 
 /**
@@ -75,7 +84,7 @@ const orm = {
             })
 
         } catch (error) {
-            return cb(new Error(error));
+            return cb(new Error(error)); 
         }
     },
 
@@ -142,6 +151,9 @@ const orm = {
     getMakeableRecipes: (currIngredientsArr, cb) => {
         currIngredientsArr = ["5b92ba92e7179a26041b2f83", "5b92bac4e7179a26041b2f87"];
 
+        // console.log(currIngredientsArr);
+        // return cb(null, 'allo');
+
         // get all recipes
         const collection = 'test_recipes';
 
@@ -165,7 +177,6 @@ const orm = {
         return all.filter(a => {
             let keep = false;
 
-
             for (let i = 0; i < a.recipe.length; i++) {
                 const aIngredient = a.recipe[i];
                 keep = false;
@@ -185,32 +196,6 @@ const orm = {
                 }
             }
 
-            // a.recipe.forEach(aIngredient => {
-            //     keep = false;
-
-            //     // convert to a .find() function
-            //     const found = current.find(currIng => {
-            //         return ((currIng.generic_type === aIngredient.generic_ingredient) ||
-            //             (currIng.generic_type === aIngredient.specific_ingredient) ||
-            //             (currIng.name === aIngredient.generic_ingredient) ||
-            //             (currIng.name === aIngredient.specific_ingredient));
-            //     })
-            //     // console.log(`Found: ${JSON.stringify(found)}`);
-            //     keep = found ? true : false;
-
-            //     // current.forEach(cIngredient => {
-            //     //     if (((aIngredient.generic_ingredient === cIngredient.name) || (aIngredient.specific_ingredient == cIngredient.name) ||
-            //     //             (aIngredient.generic_ingredient === cIngredient.generic_type) || (aIngredient.specific_ingredient == cIngredient.generic_type))) {
-            //     //         // console.log(`
-            //     //         //             Recipe generic: ${aIngredient.generic_ingredient}
-            //     //         //             Recipe specific: ${aIngredient.specific_ingredient}
-            //     //         //             Ingred generic: ${cIngredient.generic_type}
-            //     //         //             Ingred specific: ${cIngredient.name}
-            //     //         //         `)
-            //     //         keep = true;
-            //     //     }
-            //     // });
-            // });
             return keep;
         });
     },

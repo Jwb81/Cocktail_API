@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const orm = require('../../config/orm');
 
-const collection = 'test_ingredients';
+const collection = require('../../config/config').databases.mongo.development.ingredients_collection;
 
 router.get('/ingredients', (req, res) => {
     orm.getAll(collection, (err, items) => {

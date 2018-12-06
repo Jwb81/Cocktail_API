@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const orm = require('../../config/orm');
 
-const collection = 'test_recipes';
+const collection = require('../../config/config').databases.mongo.development.recipes_collection;
 
 
 // get all recipes
@@ -76,6 +76,13 @@ router.get('/recipes/filter/:term', (req, res) => {
 
 router.get('/recipes/makeable', (req, res) => {
     const ingredientsArray = req.body.ingredients;
+
+    if (!ingredientsArray) {
+        return res.json({
+            status: 404,
+            message: 'An array with at least one ingredient must be given'
+        });
+    }
 
     orm.getMakeableRecipes(ingredientsArray, (err, recipes) => {
         if (err) {

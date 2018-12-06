@@ -17,13 +17,14 @@ CREATE TABLE user_accounts (
 );
 
 CREATE TABLE user_favorites (
-    user_id INT NOT NULL,
-    recipe_id VARCHAR(45),
+    username VARCHAR(45) NOT NULL,
+    recipe_id VARCHAR(45) NOT NULL,
+    render BOOLEAN,
     make_count INT DEFAULT 0,
 
-    PRIMARY KEY (user_id, recipe_id),
-    FOREIGN KEY (user_id) 
-        REFERENCES user_accounts(id)
+    PRIMARY KEY (username, recipe_id),
+    FOREIGN KEY (username) 
+        REFERENCES user_accounts(username)
         ON DELETE CASCADE
 );
 

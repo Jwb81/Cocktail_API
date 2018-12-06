@@ -4,13 +4,13 @@ const mongo = require('./mongo');
 var ObjectID = require('mongodb').ObjectID;
 const db = mongo.db;
 
-sqlConn.query('select * from user_accounts', (err, result) => {
-    if (err) {
-        return console.log(err);
-    }
+// sqlConn.query('select * from user_accounts where username = ?', ['ace14'], (err, result) => {
+//     if (err) {
+//         return console.log(err);
+//     }
 
-    console.log(result);
-})
+//     console.log(result);
+// })
 
 
 /**
@@ -24,6 +24,15 @@ sqlConn.query('select * from user_accounts', (err, result) => {
  * @function insertOne
  * @function deleteById
  * @function updateById
+ * 
+ * 
+ * functions for users
+ * @function getUser (not being used)
+ * @function addUser
+ * @function updateUser
+ * @function loginUser
+ * @function getUserFavorites
+ * @function setUserFavorites
  * 
  * 
  * other functions
@@ -146,6 +155,135 @@ const orm = {
             cb(null, result);
         });
     },
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * USER FUNCTIONS
+ */
+    addUser: (userObj, cb) => {
+        const keys = Object.keys(userObj);
+        const vals = Object.values(userObj);
+
+        let query = `INSERT INTO user_accounts (`;
+        for (let i = 0; i < keys.length; i++) {
+            if (i < keys.length - 1) {
+                query += ` ${keys[i]},`
+            }
+            else {
+                query += ` ${keys[i]} )`
+            }
+        }
+
+        query += ' VALUES (';
+
+        for (let i = 0; i < vals.length; i++) {
+            if (i < vals.length - 1) {
+                query += ` '${vals[i]}',`
+            }
+            else {
+                query += ` '${vals[i]}' )`
+            }
+        }
+
+        const q = sqlConn.query(query, vals, (err, data) => {
+            console.log(q.sql);
+            if (err) {
+                return cb(new Error(err));
+            }
+
+            return cb(null, data);
+        })
+    },
+
+    updateUser: () => {
+
+    },
+
+    loginUser: (username, password, cb) => {
+        const query = `SElECT * FROM user_accounts 
+                        WHERE username = ?
+                        AND password = ?`;
+
+        const q = sqlConn.query(query, [username, password], (err, data) => {
+            if (err) {
+                return cb(new Error(err));
+            }
+
+            if (!data.length) {
+                return cb(null, {
+                    status: 404
+                });
+            }
+
+            cb(null, {
+                status: 200
+            })
+            
+        })
+    },
+
+    getUserFavorites: (username, cb) => {
+        const query = `SELECT * FROM user_favorites
+                        WHERE username = ?`;
+
+        sqlConn.query(query, [username], (err, data) => {
+            if (err) {
+                return cb(new Error(err));
+            }
+
+            cb(null, {
+                status: 200,
+                data
+            });
+        })
+    },
+
+    setUserFavorites: (username, recipe_id, render, cb) => {
+        let query = `INSERT INTO user_favorites (username, recipe_id, render) 
+                    VALUES (?, ?, ${render}) 
+                    ON DUPLICATE KEY UPDATE render=VALUES (render)`;
+
+        // let query = `UPDATE user_favorites SET render = ? WHERE username = ? AND recipe_id = ?`;
+
+        const q = sqlConn.query(query, [username, recipe_id], (err, data) => {
+            console.log(q.sql);
+            if (err) {
+                return cb(new Error(err));
+            }
+
+            console.log(data);
+            cb(null, {
+                status: 200,
+                data
+            })
+        })
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /**
+  * OTHER FUNCTIONS
+  */
 
 
     getMakeableRecipes: (currIngredientsArr, cb) => {
